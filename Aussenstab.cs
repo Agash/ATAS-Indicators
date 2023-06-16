@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ATAS.Indicators.Drawing;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace ATAS.Indicators.Technical
 {
     internal class Aussenstab
     {
-        public int OpenTime { get; set; }
+        public int FirstBar { get; set; }
         public decimal CurrentHigh { get; set; }
         public decimal CurrentLow { get; set; }
-        public int EndTime { get; set; }
+        public int? LastBar { get; set; }
         public bool Positive { get; set; }
-        public Rectangle Box { get; set; }
+        // public Rectangle? Rectangle { get; set; }
     }
 }

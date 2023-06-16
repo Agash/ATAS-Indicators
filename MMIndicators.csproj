@@ -7,17 +7,21 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="ATAS.Indicators">
-      <HintPath>..\..\..\..\..\Program Files (x86)\ATAS Platform\ATAS.Indicators.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\ATAS Platform\ATAS.Indicators.dll</HintPath>
     </Reference>
     <Reference Include="OFT.Rendering">
-      <HintPath>..\..\..\..\..\Program Files (x86)\ATAS Platform\OFT.Rendering.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\ATAS Platform\OFT.Rendering.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore">
-      <HintPath>..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\PresentationCore.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Reference Assemblies\Microsoft\Framework\v3.0\PresentationCore.dll</HintPath>
     </Reference>
     <Reference Include="Utils.Common">
-      <HintPath>..\..\..\..\..\Program Files (x86)\ATAS Platform\Utils.Common.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\ATAS Platform\Utils.Common.dll</HintPath>
     </Reference>
   </ItemGroup>
 

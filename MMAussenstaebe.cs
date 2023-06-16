@@ -16,8 +16,8 @@ namespace ATAS.Indicators.Technical
         private readonly List<Aussenstab> _aussenstaebe = new();
         private bool _endOnChange = true;
         private bool _drawOnLive = true;
-        private System.Drawing.Color _positiveColor = DefaultColors.Green.SetTransparency(0.8M);
-        private System.Drawing.Color _negativeColor = DefaultColors.Red.SetTransparency(0.8M);
+        private Color _positiveColor = DefaultColors.Green.SetTransparency(0.9M);
+        private Color _negativeColor = DefaultColors.Red.SetTransparency(0.9M);
 
         public bool DrawOnLive
         {
@@ -31,17 +31,17 @@ namespace ATAS.Indicators.Technical
             set
             {
                 _endOnChange = value;
-                //RecalculateValues();
+                RecalculateValues();
             }
         }
 
-        public System.Drawing.Color PositiveColor
+        public Color PositiveColor
         {
             get => _positiveColor;
             set => _positiveColor = value;
         }
 
-        public System.Drawing.Color NegativeColor
+        public Color NegativeColor
         {
             get => _negativeColor;
             set => _negativeColor = value;
@@ -54,9 +54,11 @@ namespace ATAS.Indicators.Technical
 
         protected override void OnRender(RenderContext context, DrawingLayouts layout)
         {
+            var firstVisible = FirstVisibleBarNumber - 20;
+            var lastVisible = LastVisibleBarNumber + 20;
             foreach (var stab in _aussenstaebe.Where(x => x.LastBar != null))
             {
-                if (stab.FirstBar < FirstVisibleBarNumber || stab.LastBar > LastVisibleBarNumber)
+                if (stab.FirstBar < firstVisible || stab.LastBar > lastVisible)
                     continue;
 
                 var color = stab.Positive ? _positiveColor : _negativeColor;
@@ -139,8 +141,8 @@ namespace ATAS.Indicators.Technical
 
         protected override void RecalculateValues()
         {
-            base.RecalculateValues();
             _aussenstaebe.Clear();
+            base.RecalculateValues();
         }
     }
 }

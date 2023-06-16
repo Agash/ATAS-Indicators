@@ -20,7 +20,6 @@ namespace ATAS.Indicators.Technical
         private readonly List<Aussenstab> _aussenstaebe = new();
         private bool _endOnChange = true;
         private bool _drawOnLive = true;
-        private decimal _transparency = 0.8M;
         private System.Drawing.Color _positiveColor = DefaultColors.Green.SetTransparency(0.8M);
         private System.Drawing.Color _negativeColor = DefaultColors.Red.SetTransparency(0.8M);
 
@@ -43,21 +42,13 @@ namespace ATAS.Indicators.Technical
         public System.Drawing.Color PositiveColor
         {
             get => _positiveColor;
-            set
-            {
-                _positiveColor = value;
-                RecalculateValues();
-            }
+            set => _positiveColor = value;
         }
 
         public System.Drawing.Color NegativeColor
         {
             get => _negativeColor;
-            set
-            {
-                _negativeColor = value;
-                RecalculateValues();
-            }
+            set => _negativeColor = value;
         }
         public MMAussenstaebe()
         {
@@ -156,6 +147,12 @@ namespace ATAS.Indicators.Technical
                     _aussenstaebe.Add(new Aussenstab { CurrentHigh = candle.High, CurrentLow = candle.Low, FirstBar = bar, Positive = candle.Open < candle.Close });
                 }
             }
+        }
+
+        protected override void RecalculateValues()
+        {
+            base.RecalculateValues();
+            _aussenstaebe.Clear();
         }
     }
 }

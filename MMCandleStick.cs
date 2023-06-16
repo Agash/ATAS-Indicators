@@ -1,6 +1,7 @@
 ﻿using ATAS.Indicators;
 using ATAS.Indicators.Drawing;
 using OFT.Rendering.Properties;
+using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
@@ -59,6 +60,20 @@ namespace ATAS.Indicators.Technical
             Width = 1
         };
 
+        private readonly ValueDataSeries _renderSeriesHammer = new("Visualisierung Hammer")
+        {
+            Color = DefaultColors.Yellow.Convert(),
+            VisualType = VisualMode.Hide,
+            Width = 1
+        };
+
+        private readonly ValueDataSeries _renderSeriesShootingStar = new("Visualisierung Shooting Star")
+        {
+            Color = DefaultColors.Yellow.Convert(),
+            VisualType = VisualMode.Hide,
+            Width = 1
+        };
+
         readonly PaintbarsDataSeries _bars = new("Bars") { IsHidden = true };
 
         private Color _positiveInsideBarColor = DefaultColors.Aqua.Convert();
@@ -67,8 +82,11 @@ namespace ATAS.Indicators.Technical
         private Color _positiveOutsideBarColor = DefaultColors.Fuchsia.Convert();
         private Color _negativeOutsideBarColor = DefaultColors.Purple.Convert();
 
-        private Color _positiveAStabColor = DefaultColors.Orange.Convert();
-        private Color _negativeAStabColor = DefaultColors.Yellow.Convert();
+        private Color _positiveAStabColor = DefaultColors.Teal.Convert();
+        private Color _negativeAStabColor = DefaultColors.White.Convert();
+
+        private Color _hammerColor = DefaultColors.Yellow.Convert();
+        private Color _shootingStarColor = DefaultColors.Yellow.Convert();
 
         private bool _showPositiveInsideBar = true;
         private bool _showNegativeInsideBar = true;
@@ -76,12 +94,25 @@ namespace ATAS.Indicators.Technical
         private bool _showNegativeOutsideBar = true;
         private bool _showPositiveAStab = false;
         private bool _showNegativeAStab = false;
+        private bool _showHammer = true;
+        private bool _showShootingStar = true;
 
         private bool _paintBars = true;
+
+        private decimal _fibLevelHammers = 0.382M;
 
         #endregion
         #region Properties
 
+        public decimal FibLevelHammers
+        {
+            get => _fibLevelHammers;
+            set
+            {
+                _fibLevelHammers = value;
+                RecalculateValues();
+            }
+        }
         public Color PositiveInsideBarColor
         {
             get => _positiveInsideBarColor;
@@ -138,6 +169,26 @@ namespace ATAS.Indicators.Technical
             set
             {
                 _negativeAStabColor = value;
+                RecalculateValues();
+            }
+        }
+
+        public Color HammerColor
+        {
+            get => _hammerColor;
+            set
+            {
+                _hammerColor = value;
+                RecalculateValues();
+            }
+        }
+
+        public Color ShootingStarColor
+        {
+            get => _shootingStarColor;
+            set
+            {
+                _shootingStarColor = value;
                 RecalculateValues();
             }
         }
@@ -205,6 +256,24 @@ namespace ATAS.Indicators.Technical
                 RecalculateValues();
             }
         }
+        public bool ShowHammer
+        {
+            get => _showHammer;
+            set
+            {
+                _showHammer = value;
+                RecalculateValues();
+            }
+        }
+        public bool ShowShootingStar
+        {
+            get => _showShootingStar;
+            set
+            {
+                _showShootingStar = value;
+                RecalculateValues();
+            }
+        }
 
         #endregion
 
@@ -217,6 +286,8 @@ namespace ATAS.Indicators.Technical
             DataSeries.Add(_renderSeriesInsideBarNegativ);
             DataSeries.Add(_renderSeriesAStabPositiv);
             DataSeries.Add(_renderSeriesAStabNegativ);
+            DataSeries.Add(_renderSeriesHammer);
+            DataSeries.Add(_renderSeriesShootingStar);
         }
 
         protected override void OnCalculate(int bar, decimal value)
@@ -229,12 +300,20 @@ namespace ATAS.Indicators.Technical
                 _renderSeriesInsideBarNegativ.Clear();
                 _renderSeriesAStabPositiv.Clear();
                 _renderSeriesAStabNegativ.Clear();
+                _renderSeriesHammer.Clear();
+                _renderSeriesShootingStar.Clear();
                 return;
             }
 
             var candle = GetCandle(bar);
             var prevCandle = GetCandle(bar - 1);
-            Color? barColor = null;
+
+
+            var candleSize = Math.Abs(candle.High - candle.Low);
+            var isHammer = (candle.High - (_fibLevelHammers * candleSize)) < Math.Min(candle.Open, candle.Close);
+            var isShootingStar = (candle.Low + (_fibLevelHammers * candleSize)) > Math.Max(candle.Open, candle.Close);
+
+            Color ? barColor = null;
 
             switch(candle.Open < candle.Close)
             {
@@ -264,7 +343,19 @@ namespace ATAS.Indicators.Technical
                     break;
             }
 
-            if (_paintBars && barColor != null)
+            if (isHammer)
+            {
+                _renderSeriesHammer[bar] = candle.High;
+                barColor = _hammerColor;
+            }
+            
+            if (isShootingStar)
+            {
+                _renderSeriesShootingStar[bar] = candle.Low;
+                barColor = _shootingStarColor;
+            }
+
+            if (_paintBars)
                 _bars[bar] = barColor;
 
         }

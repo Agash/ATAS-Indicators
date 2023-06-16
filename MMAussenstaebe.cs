@@ -1,15 +1,11 @@
 ﻿using ATAS.Indicators.Drawing;
-using Microsoft.VisualBasic;
 using OFT.Rendering;
 using OFT.Rendering.Context;
-using OFT.Rendering.Context.GDIPlus;
-using OFT.Rendering.Tools;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Media;
 
 namespace ATAS.Indicators.Technical
 {
@@ -35,7 +31,7 @@ namespace ATAS.Indicators.Technical
             set
             {
                 _endOnChange = value;
-                RecalculateValues();
+                //RecalculateValues();
             }
         }
 
@@ -53,50 +49,42 @@ namespace ATAS.Indicators.Technical
         public MMAussenstaebe()
         {
             EnableCustomDrawing = true;
-
-            //Subscribing only to drawing on final layout
             SubscribeToDrawingEvents(DrawingLayouts.LatestBar | DrawingLayouts.Final);
         }
 
         protected override void OnRender(RenderContext context, DrawingLayouts layout)
         {
-            // ------------------------
-            // DRAW boxes
-            // ------------------------
-
             foreach (var stab in _aussenstaebe.Where(x => x.LastBar != null))
             {
                 if (stab.FirstBar < FirstVisibleBarNumber || stab.LastBar > LastVisibleBarNumber)
                     continue;
 
                 var color = stab.Positive ? _positiveColor : _negativeColor;
-                // color = color.SetTransparency(_transparency);
 
                 var y1 = ChartInfo.GetYByPrice(stab.CurrentHigh, false);
                 var y2 = ChartInfo.GetYByPrice(stab.CurrentLow, false);
                 var x1 = ChartInfo.GetXByBar(stab.FirstBar, false);
                 var x2 = ChartInfo.GetXByBar(stab.LastBar!.Value, false);
 
-                var rect = new Rectangle(x1, y1, x2-x1, y2-y1);
+                var rect = new Rectangle(x1, y1, x2 - x1, y2 - y1);
                 context.FillRectangle(color, rect);
             }
 
-            var lastStab = _aussenstaebe.Last();
-            if (_drawOnLive && lastStab.LastBar == null)
+            var lastStab = _aussenstaebe.LastOrDefault();
+            if (lastStab != null && _drawOnLive && lastStab.LastBar == null)
             {
                 var color = lastStab.Positive ? _positiveColor : _negativeColor;
-                // color = color.SetTransparency(_transparency);
 
                 var y1 = ChartInfo.GetYByPrice(lastStab.CurrentHigh, false);
                 var y2 = ChartInfo.GetYByPrice(lastStab.CurrentLow, false);
                 var x1 = ChartInfo.GetXByBar(lastStab.FirstBar, false);
                 var x2 = ChartInfo.GetXByBar(CurrentBar, false);
 
-                
+
                 var rect = new Rectangle(x1, y1, x2 - x1, y2 - y1);
                 context.FillRectangle(color, rect);
             }
-            
+
         }
 
         protected override void OnCalculate(int bar, decimal value)
@@ -109,7 +97,7 @@ namespace ATAS.Indicators.Technical
 
             var isAussenstab = (candle.Open < candle.Close && candle.Close > prevCandle.High) || (candle.Open > candle.Close && candle.Close < prevCandle.Low);
 
-            if(isAussenstab && _initialAussenstab == null)
+            if (isAussenstab && _initialAussenstab == null)
             {
                 _initialAussenstab = new Aussenstab
                 {
@@ -123,15 +111,15 @@ namespace ATAS.Indicators.Technical
             if (_aussenstaebe.Count < 1 && _initialAussenstab != null)
                 _aussenstaebe.Add(_initialAussenstab);
 
-            if(_aussenstaebe.Count > 0)
+            if (_aussenstaebe.Count > 0)
             {
                 var lastAussenstab = _aussenstaebe.Last();
 
-                if(lastAussenstab.LastBar == null && lastAussenstab.FirstBar != bar)
+                if (lastAussenstab.LastBar == null && lastAussenstab.FirstBar != bar)
                 {
                     if ((candle.Open < candle.Close && candle.Close > lastAussenstab.CurrentHigh) || (candle.Open > candle.Close && candle.Close < lastAussenstab.CurrentLow))
                     {
-                        lastAussenstab.LastBar = _endOnChange ? bar : bar-1;
+                        lastAussenstab.LastBar = _endOnChange ? bar : bar - 1;
 
                         if (isAussenstab)
                             _aussenstaebe.Add(new Aussenstab { CurrentHigh = candle.High, CurrentLow = candle.Low, FirstBar = bar, Positive = candle.Open < candle.Close });
@@ -142,7 +130,7 @@ namespace ATAS.Indicators.Technical
                         lastAussenstab.CurrentLow = Math.Min(lastAussenstab.CurrentLow, candle.Low);
                     }
                 }
-                else if(lastAussenstab.LastBar != null && isAussenstab)
+                else if (lastAussenstab.LastBar != null && isAussenstab)
                 {
                     _aussenstaebe.Add(new Aussenstab { CurrentHigh = candle.High, CurrentLow = candle.Low, FirstBar = bar, Positive = candle.Open < candle.Close });
                 }

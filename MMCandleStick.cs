@@ -1,15 +1,7 @@
-﻿using ATAS.Indicators;
-using ATAS.Indicators.Drawing;
-using OFT.Rendering.Properties;
+﻿using ATAS.Indicators.Drawing;
 using System;
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-using System.Resources;
-using System.Security.AccessControl;
 using System.Windows.Media;
-using System.Xml.Linq;
-using Utils.Common.Logging;
 
 namespace ATAS.Indicators.Technical
 {
@@ -313,9 +305,9 @@ namespace ATAS.Indicators.Technical
             var isHammer = (candle.High - (_fibLevelHammers * candleSize)) < Math.Min(candle.Open, candle.Close);
             var isShootingStar = (candle.Low + (_fibLevelHammers * candleSize)) > Math.Max(candle.Open, candle.Close);
 
-            Color ? barColor = null;
+            Color? barColor = null;
 
-            switch(candle.Open < candle.Close)
+            switch (candle.Open < candle.Close)
             {
                 case true when candle.High < prevCandle.High && candle.Low > prevCandle.Low && _showPositiveInsideBar:
                     _renderSeriesInsideBarPositiv[bar] = candle.High;
@@ -348,7 +340,7 @@ namespace ATAS.Indicators.Technical
                 _renderSeriesHammer[bar] = candle.High;
                 barColor = _hammerColor;
             }
-            
+
             if (isShootingStar)
             {
                 _renderSeriesShootingStar[bar] = candle.Low;

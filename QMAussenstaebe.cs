@@ -1,6 +1,5 @@
 ﻿using ATAS.Indicators.Drawing;
 using OFT.Rendering;
-using OFT.Rendering.Context;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -103,6 +102,7 @@ namespace ATAS.Indicators.Technical
             }
 
             Rectangles.Clear();
+
             var firstVisible = FirstVisibleBarNumber - 20;
             var lastVisible = LastVisibleBarNumber + 20;
 
@@ -112,14 +112,14 @@ namespace ATAS.Indicators.Technical
                     continue;
 
                 var color = stab.Positive ? _positiveColor : _negativeColor;
-                Rectangles.Add(new DrawingRectangle(stab.FirstBar, stab.CurrentHigh - 1, stab.LastBar!.Value - 1, stab.CurrentLow, new System.Drawing.Pen(color), new SolidBrush(color)));
+                Rectangles.Add(new DrawingRectangle(stab.FirstBar, stab.CurrentHigh - 1, stab.LastBar!.Value - 1, stab.CurrentLow, new Pen(color), new SolidBrush(color)));
             }
 
             var lastStab = _aussenstaebe.LastOrDefault();
             if (lastStab != null && _drawOnLive && lastStab.LastBar == null)
             {
                 var color = lastStab.Positive ? _positiveColor : _negativeColor;
-                Rectangles.Add(new DrawingRectangle(lastStab.FirstBar, lastStab.CurrentHigh, CurrentBar - 1, lastStab.CurrentLow, new System.Drawing.Pen(color), new SolidBrush(color)));
+                Rectangles.Add(new DrawingRectangle(lastStab.FirstBar, lastStab.CurrentHigh, CurrentBar - 1, lastStab.CurrentLow, new Pen(color), new SolidBrush(color)));
             }
         }
 

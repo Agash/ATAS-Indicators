@@ -1,10 +1,6 @@
 ﻿using ATAS.Indicators.Drawing;
-using OFT.Rendering.Properties;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing;
-using System.Security.AccessControl;
-using System.Xml.Linq;
 
 namespace ATAS.Indicators.Technical
 {

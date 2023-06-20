@@ -2,8 +2,6 @@
 using OFT.Rendering;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using static ATAS.Indicators.Technical.DynamicLevels;
 
 namespace ATAS.Indicators.Technical
 {

@@ -1,4 +1,6 @@
-﻿namespace ATAS.Indicators.Technical
+﻿using ATAS.Indicators.Drawing;
+
+namespace ATAS.Indicators.Technical
 {
     internal class Aussenstab
     {
@@ -7,6 +9,7 @@
         public decimal CurrentLow { get; set; }
         public int? LastBar { get; set; }
         public bool Positive { get; set; }
-        // public Rectangle? Rectangle { get; set; }
+        
+        public DrawingRectangle? Rectangle { get; set; }
     }
 }

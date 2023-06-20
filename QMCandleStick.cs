@@ -5,8 +5,8 @@ using System.Windows.Media;
 
 namespace ATAS.Indicators.Technical
 {
-    [DisplayName("MM CandleSticks")]
-    public class MMCandleStick : Indicator
+    [DisplayName("QM CandleSticks")]
+    public class QMCandleStick : Indicator
     {
         #region Fields
 
@@ -14,7 +14,7 @@ namespace ATAS.Indicators.Technical
         {
             Color = DefaultColors.Fuchsia.Convert(),
             VisualType = VisualMode.Hide,
-            Width = 1
+            Width = 1,
         };
 
         private readonly ValueDataSeries _renderSeriesOutsideBarNegativ = new("Visualisierung Outside Bar Negativ")

@@ -14,6 +14,9 @@
     <Reference Include="ATAS.Indicators">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\ATAS Platform\ATAS.Indicators.dll</HintPath>
     </Reference>
+    <Reference Include="ATAS.Indicators.Technical">
+      <HintPath>..\..\..\..\..\Program Files (x86)\ATAS Platform\ATAS.Indicators.Technical.dll</HintPath>
+    </Reference>
     <Reference Include="OFT.Rendering">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\ATAS Platform\OFT.Rendering.dll</HintPath>
     </Reference>

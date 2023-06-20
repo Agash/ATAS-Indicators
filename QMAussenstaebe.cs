@@ -10,8 +10,8 @@ using Color = System.Drawing.Color;
 
 namespace ATAS.Indicators.Technical
 {
-    [DisplayName("MM Aussenstaebe")]
-    public class MMAussenstaebe : Indicator
+    [DisplayName("QM Aussenstaebe")]
+    public class QMAussenstaebe : Indicator
     {
         private Aussenstab? _initialAussenstab = null;
         private readonly List<Aussenstab> _aussenstaebe = new();
@@ -47,7 +47,7 @@ namespace ATAS.Indicators.Technical
             get => _negativeColor;
             set => _negativeColor = value;
         }
-        public MMAussenstaebe()
+        public QMAussenstaebe()
         {
             EnableCustomDrawing = true;
             DrawAbovePrice = false;

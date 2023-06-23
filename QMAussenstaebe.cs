@@ -61,7 +61,7 @@ namespace ATAS.Indicators.Technical
 
             var firstVisible = FirstVisibleBarNumber - 20;
             var lastVisible = LastVisibleBarNumber + 20;
-            foreach (var stab in _aussenstaebe)
+            foreach (var stab in _aussenstaebe.Where(x => x.Rectangle != null).DistinctBy(x => x.Id))
             {
                 if (stab.FirstBar < firstVisible || stab.LastBar > lastVisible)
                     continue;

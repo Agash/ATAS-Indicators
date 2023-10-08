@@ -11,7 +11,7 @@ namespace ATAS.Indicators.Technical
 
         private readonly ATR _atr = new()
         {
-            Period = 10
+            Period = 5
         };
 
         private bool _showAsTicks = true;

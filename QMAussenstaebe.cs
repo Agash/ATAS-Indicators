@@ -1,10 +1,12 @@
 ﻿using ATAS.Indicators.Drawing;
 using OFT.Rendering;
+using OFT.Rendering.Context;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Windows.Media;
 using Color = System.Drawing.Color;
 
 namespace ATAS.Indicators.Technical
@@ -46,11 +48,29 @@ namespace ATAS.Indicators.Technical
             get => _negativeColor;
             set => _negativeColor = value;
         }
-        public QMAussenstaebe()
+        public QMAussenstaebe() : base(true)
         {
-            EnableCustomDrawing = true;
             DrawAbovePrice = false;
+
+            EnableCustomDrawing = true;
+            SubscribeToDrawingEvents(DrawingLayouts.Historical | DrawingLayouts.LatestBar | DrawingLayouts.Final);
         }
+        protected override void OnRender(RenderContext context, DrawingLayouts layout)
+        {
+            Rectangles.Clear();
+
+            var firstVisible = FirstVisibleBarNumber - 20;
+            var lastVisible = LastVisibleBarNumber + 20;
+            foreach (var stab in _aussenstaebe.Where(x => x.Rectangle != null).DistinctBy(x => x.Id))
+            {
+                if (stab.FirstBar < firstVisible || stab.LastBar > lastVisible)
+                    continue;
+
+                if(stab.Rectangle != null)
+                    Rectangles.Add(stab.Rectangle);
+            }
+        }
+
 
         protected override void OnCalculate(int bar, decimal value)
         {
@@ -78,48 +98,57 @@ namespace ATAS.Indicators.Technical
 
             if (_aussenstaebe.Count > 0)
             {
+                Aussenstab? currentStab = null;
                 var lastAussenstab = _aussenstaebe.Last();
 
-                if (lastAussenstab.LastBar == null && lastAussenstab.FirstBar != bar)
+                if (!lastAussenstab.LastBar.HasValue && lastAussenstab.FirstBar != bar)
                 {
-                    if ((candle.Open < candle.Close && candle.Close > lastAussenstab.CurrentHigh) || (candle.Open > candle.Close && candle.Close < lastAussenstab.CurrentLow))
+                    if (/** CurrentBar != bar && **/ ((candle.Open < candle.Close && candle.Close > lastAussenstab.CurrentHigh) || (candle.Open > candle.Close && candle.Close < lastAussenstab.CurrentLow)))
                     {
                         lastAussenstab.LastBar = _endOnChange ? bar : bar - 1;
 
                         if (isAussenstab)
-                            _aussenstaebe.Add(new Aussenstab { CurrentHigh = candle.High, CurrentLow = candle.Low, FirstBar = bar, Positive = candle.Open < candle.Close });
+                        {
+                            var stab = new Aussenstab { CurrentHigh = candle.High, CurrentLow = candle.Low, FirstBar = bar, Positive = candle.Open < candle.Close };
+                            _aussenstaebe.Add(stab);
+                            currentStab = stab;
+                        }
                     }
                     else
                     {
                         lastAussenstab.CurrentHigh = Math.Max(lastAussenstab.CurrentHigh, candle.High);
                         lastAussenstab.CurrentLow = Math.Min(lastAussenstab.CurrentLow, candle.Low);
+                        _aussenstaebe.Add(lastAussenstab);
+                        currentStab = lastAussenstab;
                     }
                 }
-                else if (lastAussenstab.LastBar != null && isAussenstab)
+                else if (lastAussenstab.LastBar.HasValue && isAussenstab)
                 {
-                    _aussenstaebe.Add(new Aussenstab { CurrentHigh = candle.High, CurrentLow = candle.Low, FirstBar = bar, Positive = candle.Open < candle.Close });
+                    var stab = new Aussenstab { CurrentHigh = candle.High, CurrentLow = candle.Low, FirstBar = bar, Positive = candle.Open < candle.Close };
+                    _aussenstaebe.Add(stab);
+                    currentStab = stab;
                 }
-            }
 
-            Rectangles.Clear();
+                if(_drawOnLive && CurrentBar == bar && currentStab != null && !currentStab.LastBar.HasValue)
+                {
+                    var color = currentStab.Positive ? _positiveColor : _negativeColor;
+                    currentStab.Rectangle = new DrawingRectangle(currentStab.FirstBar, currentStab.CurrentHigh, CurrentBar - 1, currentStab.CurrentLow, new System.Drawing.Pen(color), new SolidBrush(color));
 
-            var firstVisible = FirstVisibleBarNumber - 20;
-            var lastVisible = LastVisibleBarNumber + 20;
+                    if(currentStab.Rectangle != null && currentStab.LastBar.HasValue)
+                    {
+                        currentStab.Rectangle = null;
+                    }
+                }
 
-            foreach (var stab in _aussenstaebe.Where(x => x.LastBar != null))
-            {
-                if (stab.FirstBar < firstVisible || stab.LastBar > lastVisible)
-                    continue;
-
-                var color = stab.Positive ? _positiveColor : _negativeColor;
-                Rectangles.Add(new DrawingRectangle(stab.FirstBar, stab.CurrentHigh - 1, stab.LastBar!.Value - 1, stab.CurrentLow, new Pen(color), new SolidBrush(color)));
-            }
-
-            var lastStab = _aussenstaebe.LastOrDefault();
-            if (lastStab != null && _drawOnLive && lastStab.LastBar == null)
-            {
-                var color = lastStab.Positive ? _positiveColor : _negativeColor;
-                Rectangles.Add(new DrawingRectangle(lastStab.FirstBar, lastStab.CurrentHigh, CurrentBar - 1, lastStab.CurrentLow, new Pen(color), new SolidBrush(color)));
+                if (lastAussenstab.LastBar.HasValue)
+                {
+                    if (lastAussenstab.Rectangle != null)
+                    {
+                        lastAussenstab.Rectangle = null;
+                    }
+                    var color = lastAussenstab.Positive ? _positiveColor : _negativeColor;
+                    lastAussenstab.Rectangle = new DrawingRectangle(lastAussenstab.FirstBar, lastAussenstab.CurrentHigh, lastAussenstab.LastBar!.Value -1, lastAussenstab.CurrentLow, new System.Drawing.Pen(color), new SolidBrush(color));
+                }
             }
         }
 
